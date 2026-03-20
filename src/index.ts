@@ -10,6 +10,7 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import z from "zod";
 
 import { auth } from "./lib/auth.js";
 import { aiRoutes } from "./routes/ai.js";
@@ -35,7 +36,7 @@ await app.register(fastifySwagger, {
     servers: [
       {
         description: "Localhost",
-        url: "http://localhost:3000",
+        url: "http://localhost:3001",
       },
     ],
   },
@@ -63,6 +64,25 @@ await app.register(fastifyApiReference, {
       },
     ],
     theme: "bluePlanet",
+  },
+});
+
+app.withTypeProvider<ZodTypeProvider>().route({
+  method: "GET",
+  url: "/",
+  schema: {
+    description: "Hello world",
+    tags: ["Hello World"],
+    response: {
+      200: z.object({
+        message: z.string(),
+      }),
+    },
+  },
+  handler: () => {
+    return {
+      message: "Hello World",
+    };
   },
 });
 
