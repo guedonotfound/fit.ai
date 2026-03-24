@@ -65,14 +65,27 @@ Escolha a divisão adequada com base nos dias disponíveis:
 SEMPRE forneça um \`coverImageUrl\` para cada dia de treino. Escolha com base no foco muscular:
 
 **Dias majoritariamente superiores** (peito, costas, ombros, bíceps, tríceps, push, pull, upper, full body):
-- https://gw8hy3fdcv.ufs.sh/f/ccoBDpLoAPCO3y8pQ6GBg8iqe9pP2JrHjwd1nfKtVSQskI0v
-- https://gw8hy3fdcv.ufs.sh/f/ccoBDpLoAPCOW3fJmqZe4yoUcwvRPQa8kmFprzNiC30hqftL
+-https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1532029837206-abbe2b7620e3?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1598575211932-b13da022467d?q=80&w=1000&auto=format&fit=crop
 
 **Dias majoritariamente inferiores** (pernas, glúteos, quadríceps, posterior, panturrilha, legs, lower):
-- https://gw8hy3fdcv.ufs.sh/f/ccoBDpLoAPCOgCHaUgNGronCvXmSzAMs1N3KgLdE5yHT6Ykj
-- https://gw8hy3fdcv.ufs.sh/f/ccoBDpLoAPCO85RVu3morROwZk5NPhs1jzH7X8TyEvLUCGxY
+-https://images.unsplash.com/photo-1534367957980-4efd5761fe88?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1434596922112-19c563067271?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1590487988256-9ed24133863e?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1000&auto=format&fit=crop
 
-Alterne entre as duas opções de cada categoria para variar. Dias de descanso usam imagem de superior.`;
+**Dias de descanso (rest, recovery, off):
+-https://images.unsplash.com/photo-1596357395217-80df13d3cff3?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1000&auto=format&fit=crop
+-https://images.unsplash.com/photo-1519315901367-f34ff9154487?q=80&w=1000&auto=format&fit=crop
+
+Alterne entre as opções de cada categoria para variar.`;
 
 export const aiRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
