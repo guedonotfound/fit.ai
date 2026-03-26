@@ -14,6 +14,7 @@ interface OutputDto {
   heightInCm: number;
   age: number;
   bodyFatPercentage: number;
+  mainGoal: string;
 }
 
 export class UpsertUserTrainData {
@@ -36,6 +37,7 @@ export class UpsertUserTrainData {
       heightInCm: user.heightInCm!,
       age: user.age!,
       bodyFatPercentage: user.bodyFatPercentage!,
+      mainGoal: user.mainGoal!,
     };
   }
 }

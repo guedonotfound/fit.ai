@@ -11,6 +11,7 @@ interface OutputDto {
   heightInCm: number;
   age: number;
   bodyFatPercentage: number;
+  mainGoal: string;
 }
 
 export class GetUserTrainData {
@@ -26,7 +27,8 @@ export class GetUserTrainData {
       user.weightInGrams === null ||
       user.heightInCm === null ||
       user.age === null ||
-      user.bodyFatPercentage === null
+      user.bodyFatPercentage === null ||
+      user.mainGoal === null
     ) {
       return null;
     }
@@ -38,6 +40,7 @@ export class GetUserTrainData {
       heightInCm: user.heightInCm,
       age: user.age,
       bodyFatPercentage: user.bodyFatPercentage,
+      mainGoal: user.mainGoal,
     };
   }
 }

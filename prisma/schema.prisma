@@ -22,6 +22,7 @@ model User {
   heightInCm        Int?
   age               Int?
   bodyFatPercentage Int?
+  mainGoal          String?
 
   @@unique([email])
   @@map("user")

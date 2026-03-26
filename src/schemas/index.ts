@@ -167,6 +167,7 @@ export const UserTrainDataSchema = z.object({
   heightInCm: z.number().min(0),
   age: z.number().min(0),
   bodyFatPercentage: z.number().min(0).max(100),
+  mainGoal: z.string(),
 });
 
 export const UpsertUserTrainDataSchema = z.object({
@@ -175,6 +176,7 @@ export const UpsertUserTrainDataSchema = z.object({
   heightInCm: z.number().min(0),
   age: z.number().min(0),
   bodyFatPercentage: z.number().min(0).max(100),
+  mainGoal: z.string(),
 });
 
 export const WorkoutPlanSchema = z.object({
