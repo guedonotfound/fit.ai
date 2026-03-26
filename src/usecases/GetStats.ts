@@ -71,22 +71,57 @@ export class GetStats {
       { workoutDayCompleted: boolean; workoutDayStarted: boolean }
     > = {};
 
-    sessions.forEach((session) => {
-      const dateKey = dayjs.utc(session.startedAt).format("YYYY-MM-DD");
+    const planCreationDate = dayjs(workoutPlan.createdAt).startOf("day");
 
-      if (!consistencyByDay[dateKey]) {
+    const totalDays = toDate.diff(fromDate, "day") + 1;
+
+    for (let i = 0; i < totalDays; i++) {
+      const day = fromDate.add(i, "day");
+      const dateKey = day.format("YYYY-MM-DD");
+
+      const isFuture = day.isAfter(dayjs.utc(), "day");
+
+      const weekDayName = WEEKDAY_MAP[day.day()];
+      const currentWorkoutDay = workoutPlan.workoutDays.find(
+        (d) => d.weekDay === weekDayName,
+      );
+
+      if (day.isBefore(planCreationDate, "day")) {
         consistencyByDay[dateKey] = {
           workoutDayCompleted: false,
           workoutDayStarted: false,
         };
+        continue;
       }
 
-      consistencyByDay[dateKey].workoutDayStarted = true;
-
-      if (session.completedAt !== null) {
-        consistencyByDay[dateKey].workoutDayCompleted = true;
+      if (isFuture) {
+        consistencyByDay[dateKey] = {
+          workoutDayCompleted: false,
+          workoutDayStarted: false,
+        };
+        continue;
       }
-    });
+
+      const daySessions = sessions.filter(
+        (s) => s.workoutDayId === currentWorkoutDay?.id,
+      );
+
+      const workoutDayStarted = daySessions.length > 0;
+      const workoutDayCompleted = daySessions.some(
+        (s) => s.completedAt !== null,
+      );
+
+      consistencyByDay[dateKey] = { workoutDayCompleted, workoutDayStarted };
+
+      if (currentWorkoutDay?.isRest) {
+        consistencyByDay[dateKey] = {
+          workoutDayCompleted: true,
+          workoutDayStarted: true,
+        };
+      }
+    }
+
+    console.log(consistencyByDay);
 
     const completedSessions = sessions.filter((s) => s.completedAt !== null);
     const completedWorkoutsCount = completedSessions.length;
@@ -117,46 +152,57 @@ export class GetStats {
   private async calculateStreak(
     workoutPlanId: string,
     workoutDays: Array<{
+      id: string;
       weekDay: string;
       isRest: boolean;
+      workoutSessions: Array<{ startedAt: Date; completedAt: Date | null }>;
     }>,
     currentDate: dayjs.Dayjs,
   ): Promise<number> {
-    const planWeekDays = new Set(workoutDays.map((d) => d.weekDay));
-    const restWeekDays = new Set(
-      workoutDays.filter((d) => d.isRest).map((d) => d.weekDay),
-    );
+    const workoutPlan = await prisma.workoutPlan.findUnique({
+      where: {
+        id: workoutPlanId,
+      },
+      select: {
+        createdAt: true,
+      },
+    });
 
     const allSessions = await prisma.workoutSession.findMany({
       where: {
         workoutDay: { workoutPlanId },
         completedAt: { not: null },
       },
-      select: { startedAt: true },
+      select: {
+        startedAt: true,
+        workoutDayId: true,
+      },
     });
-
-    const completedDates = new Set(
-      allSessions.map((s) => dayjs.utc(s.startedAt).format("YYYY-MM-DD")),
-    );
 
     let streak = 0;
     let day = currentDate;
+    const createdAt = dayjs(workoutPlan?.createdAt).startOf("day");
 
-    for (let i = 0; i < 365; i++) {
+    while (!day.isBefore(createdAt, "day")) {
       const weekDay = WEEKDAY_MAP[day.day()];
+      const targetWorkoutDay = workoutDays.find((d) => d.weekDay === weekDay);
 
-      if (!planWeekDays.has(weekDay)) {
+      if (!targetWorkoutDay) {
         day = day.subtract(1, "day");
         continue;
       }
 
-      if (restWeekDays.has(weekDay)) {
+      if (targetWorkoutDay.isRest) {
+        streak++;
         day = day.subtract(1, "day");
         continue;
       }
 
-      const dateKey = day.format("YYYY-MM-DD");
-      if (completedDates.has(dateKey)) {
+      const hasCompletedSession = allSessions.some(
+        (s) => s.workoutDayId === targetWorkoutDay.id,
+      );
+
+      if (hasCompletedSession) {
         streak++;
         day = day.subtract(1, "day");
         continue;
