@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 
-import { NotFoundError } from "../errors/index.js";
 import { WeekDay } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/db.js";
 
@@ -23,9 +22,9 @@ interface InputDto {
 }
 
 interface OutputDto {
-  activeWorkoutPlanId: string;
+  activeWorkoutPlanId?: string;
   todayWorkoutDay?: {
-    workoutPlanId: string;
+    workoutPlanId?: string;
     id: string;
     name: string;
     isRest: boolean;
@@ -60,12 +59,8 @@ export class GetHomeData {
       },
     });
 
-    if (!workoutPlan) {
-      throw new NotFoundError("Active workout plan not found");
-    }
-
     const todayWeekDay = WEEKDAY_MAP[currentDate.day()];
-    const todayWorkoutDay = workoutPlan.workoutDays.find(
+    const todayWorkoutDay = workoutPlan?.workoutDays.find(
       (day) => day.weekDay === todayWeekDay,
     );
 
@@ -75,7 +70,7 @@ export class GetHomeData {
     const weekSessions = await prisma.workoutSession.findMany({
       where: {
         workoutDay: {
-          workoutPlanId: workoutPlan.id,
+          workoutPlanId: workoutPlan?.id,
         },
         startedAt: {
           gte: weekStart.toDate(),
@@ -93,10 +88,10 @@ export class GetHomeData {
       const day = weekStart.add(i, "day");
       const dateKey = day.format("YYYY-MM-DD");
 
-      const planCreationDate = dayjs(workoutPlan.createdAt).startOf("day");
+      const planCreationDate = dayjs(workoutPlan?.createdAt).startOf("day");
       const isBeforeCreation = day.isBefore(planCreationDate, "day");
 
-      const currentWorkoutDay = workoutPlan.workoutDays[i];
+      const currentWorkoutDay = workoutPlan?.workoutDays[i];
 
       const daySessions = weekSessions.filter(
         (s) => s.workoutDayId === currentWorkoutDay?.id,
@@ -129,27 +124,32 @@ export class GetHomeData {
       }
     }
 
-    const workoutStreak = await this.calculateStreak(
-      workoutPlan.id,
-      workoutPlan.workoutDays,
-      currentDate,
-    );
+    let workoutStreak = 0;
+
+    if (workoutPlan) {
+      workoutStreak = await this.calculateStreak(
+        workoutPlan?.id,
+        workoutPlan?.workoutDays,
+        currentDate,
+      );
+    }
 
     return {
-      activeWorkoutPlanId: workoutPlan.id,
-      todayWorkoutDay: todayWorkoutDay
-        ? {
-            workoutPlanId: workoutPlan.id,
-            id: todayWorkoutDay.id,
-            name: todayWorkoutDay.name,
-            isRest: todayWorkoutDay.isRest,
-            weekDay: todayWorkoutDay.weekDay,
-            estimatedDurationInSeconds:
-              todayWorkoutDay.estimatedDurationInSeconds,
-            coverImageUrl: todayWorkoutDay.coverImageUrl ?? undefined,
-            exercisesCount: todayWorkoutDay.exercises.length,
-          }
-        : undefined,
+      activeWorkoutPlanId: workoutPlan?.id,
+      todayWorkoutDay:
+        todayWorkoutDay && workoutPlan
+          ? {
+              workoutPlanId: workoutPlan?.id,
+              id: todayWorkoutDay.id,
+              name: todayWorkoutDay.name,
+              isRest: todayWorkoutDay.isRest,
+              weekDay: todayWorkoutDay.weekDay,
+              estimatedDurationInSeconds:
+                todayWorkoutDay.estimatedDurationInSeconds,
+              coverImageUrl: todayWorkoutDay.coverImageUrl ?? undefined,
+              exercisesCount: todayWorkoutDay.exercises.length,
+            }
+          : undefined,
       workoutStreak,
       consistencyByDay,
     };

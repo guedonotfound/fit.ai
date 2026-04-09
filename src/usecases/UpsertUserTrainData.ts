@@ -6,6 +6,7 @@ interface InputDto {
   heightInCm: number;
   age: number;
   bodyFatPercentage: number;
+  mainGoal: string;
 }
 
 interface OutputDto {
@@ -28,6 +29,7 @@ export class UpsertUserTrainData {
         heightInCm: dto.heightInCm,
         age: dto.age,
         bodyFatPercentage: bodyFatPercentageInDb,
+        mainGoal: dto.mainGoal,
       },
     });
 
