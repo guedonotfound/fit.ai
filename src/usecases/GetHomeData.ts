@@ -24,7 +24,7 @@ interface InputDto {
 interface OutputDto {
   activeWorkoutPlanId?: string;
   todayWorkoutDay?: {
-    workoutPlanId?: string;
+    workoutPlanId: string;
     id: string;
     name: string;
     isRest: boolean;
