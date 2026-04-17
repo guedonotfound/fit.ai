@@ -101,7 +101,7 @@ export const aiRoutes = async (app: FastifyInstance) => {
         model: groq("openai/gpt-oss-120b"),
         system: SYSTEM_PROMPT,
         messages: await convertToModelMessages(messages),
-        stopWhen: stepCountIs(5),
+        stopWhen: stepCountIs(10),
         tools: {
           getUserTrainData: tool({
             description:
