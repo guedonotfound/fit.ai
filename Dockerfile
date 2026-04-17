@@ -17,10 +17,8 @@ RUN pnpm install --frozen-lockfile
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Gera para o build compilar sem erro de tipo
 RUN pnpm prisma generate
 RUN pnpm run build
-# O seu comando de cópia de segurança
 RUN cp -r src/generated dist/generated || true
 
 # ------- Production -------
@@ -33,14 +31,10 @@ RUN cp -r src/generated dist/generated || true
     COPY package.json pnpm-lock.yaml ./
     COPY prisma ./prisma/
     
-    # Instala as dependências de produção
     RUN pnpm install --frozen-lockfile --prod --ignore-scripts
-    
-    # 1. Usamos 'pnpm dlx' para baixar e executar a CLI do Prisma de forma isolada
-    # Isso evita o erro de "prisma not found"
+  
     RUN pnpm dlx prisma generate
     
-    # 2. Copia o código compilado do estágio de build
     COPY --from=build /app/dist ./dist
     
     EXPOSE 3333
